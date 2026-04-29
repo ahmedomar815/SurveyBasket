@@ -1,15 +1,17 @@
+using FluentValidation;
+using MapsterMapper;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using SurveyBasket;
+using SurveyBasket.Contracts.Validations;
 using SurveyBasket.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddDependencies();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IPollService, PollService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
