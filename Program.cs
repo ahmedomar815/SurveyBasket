@@ -1,20 +1,18 @@
 using FluentValidation;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using SurveyBasket;
-using SurveyBasket.Contracts.Validations;
-using SurveyBasket.Services;
+using SurveyBasket.Persistence;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
-builder.Services.AddDependencies();
+
+builder.Services.AddDependencies(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
