@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SurveyBasket.Services;
+using System.Collections.Generic;
 
 
 namespace SurveyBasket.Controllers
@@ -16,33 +17,31 @@ namespace SurveyBasket.Controllers
         [HttpGet("getAll")] 
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var polls= await _pollService.GetAllAsync( cancellationToken);
-            var response=polls.Adapt<IEnumerable<Poll>>();  
-
+            var polls=await _pollService.GetAllAsync(cancellationToken);
+            var response = polls.Adapt<IEnumerable<PollResponse>>();
             return Ok(response);
         }
         [HttpGet("{Id}")]
         public async Task<IActionResult> Get([FromRoute] int Id, CancellationToken cancellationToken)
         {
-            var poll = await _pollService.GetAsync(Id, cancellationToken);
-           if(poll == null)
-                return NotFound();
-            var response = poll.Adapt<PollResponse>();
+           var currentPoll=await _pollService.GetAsync(Id, cancellationToken);
+            if(currentPoll is null) return NotFound();
+            var response= currentPoll.Adapt<PollResponse>();
             return Ok(response);
         }
        
          [HttpPost("")]
          public async Task<IActionResult> Add([FromBody] PollRequest request,CancellationToken cancellationToken)
          {
-            var newpoll = await _pollService.AddAsync(request.Adapt<Poll>(), cancellationToken);
-            return CreatedAtAction(nameof(Get), new { id = newpoll.Id }, newpoll);
-         }
+             var poll=await _pollService.AddAsync(request.Adapt<Poll>(), cancellationToken);
+             return CreatedAtAction(nameof(Get), new { Id = poll.Id }, poll.Adapt<PollResponse>());
+        }
 
         [HttpPut("{Id}")]
         public async Task<IActionResult> Update([FromRoute] int Id, [FromBody] PollRequest request, CancellationToken cancellationToken)
         {
-            var IsUpdated = await _pollService.UpdateAsync(Id, request.Adapt<Poll>(),cancellationToken);
-            if (!IsUpdated)
+           var Isupdated= await _pollService.UpdateAsync(Id, request.Adapt<Poll>(), cancellationToken);
+            if (!Isupdated)
                 return NotFound();
             return NoContent();
         }

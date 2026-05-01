@@ -13,7 +13,7 @@ namespace SurveyBasket.Controllers
         [HttpPost]
         public async Task<IActionResult>LoginAsync(LoginRequest loginRequest,CancellationToken cancellationToken)
         {
-            var authResult = await _authService.GetTokenAsync(loginRequest.Eamil,loginRequest.Password, cancellationToken);
+            var authResult = await _authService.GetTokenAsync(loginRequest.Email,loginRequest.Password, cancellationToken);
             return authResult == null ? BadRequest("invalid Email or Password") : Ok(authResult);
         }
     }
