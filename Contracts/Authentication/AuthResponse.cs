@@ -8,8 +8,9 @@ namespace SurveyBasket.Contracts.Authentication
         string FirstName,
         string LastName,
         string Token,
-        int ExpiresIn
-
+        int ExpiresIn,
+        string RefreshToken,
+        DateTime RefreshTokenExpiration
         );
 
     

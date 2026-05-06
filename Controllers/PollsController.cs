@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Entities;
 using SurveyBasket.Services;
 using System.Collections.Generic;
 
@@ -9,17 +11,21 @@ namespace SurveyBasket.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class PollsController(IPollService pollService) : ControllerBase
+    public class PollsController(IPollService pollService,UserManager<ApplicationUser> userManager) : ControllerBase
     {
         private  readonly IPollService  _pollService= pollService;
-        
 
-        [HttpGet("getAll")] 
+        public UserManager<ApplicationUser> _UserManager  = userManager;
+
+        [HttpGet("getAll")]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var polls=await _pollService.GetAllAsync(cancellationToken);
+            var polls = await _pollService.GetAllAsync(cancellationToken);
             var response = polls.Adapt<IEnumerable<PollResponse>>();
             return Ok(response);
+
+           
+
         }
         [HttpGet("{Id}")]
         public async Task<IActionResult> Get([FromRoute] int Id, CancellationToken cancellationToken)

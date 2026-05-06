@@ -11,6 +11,8 @@ namespace SurveyBasket.Persistence.EntitiesConfiguration
             
             builder.Property(x=>x.FirstName).HasMaxLength(100);
             builder.Property(x=>x.LastName).HasMaxLength(100);
+            builder.OwnsMany(u => u.RefreshTokens).ToTable("RefreshTokens").WithOwner()
+                .HasForeignKey("UserId");
         }
     }
 }
