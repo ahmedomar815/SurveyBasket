@@ -3,10 +3,10 @@
     public interface IPollService
     {
       Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken = default);
-       Task<Poll?> GetAsync(int Id, CancellationToken cancellationToken = default);
-        Task<Poll> AddAsync(Poll poll, CancellationToken cancellationToken=default);
-       Task< bool> UpdateAsync(int Id, Poll poll, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAsync(int Id, CancellationToken cancellationToken = default);
-        Task<bool>TogglePublishStatusAsync(int Id, CancellationToken cancellationToken = default);
+       Task<Result<Poll>> GetAsync(int Id, CancellationToken cancellationToken = default);
+        Task<Result<Poll>> AddAsync(PollRequest poll, CancellationToken cancellationToken=default);
+       Task<Result> UpdateAsync(int Id, PollRequest poll, CancellationToken cancellationToken = default);
+        Task<Result> DeleteAsync(int Id, CancellationToken cancellationToken = default);
+        Task<Result>TogglePublishStatusAsync(int Id, CancellationToken cancellationToken = default);
     }
 }

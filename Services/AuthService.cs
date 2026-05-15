@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SurveyBasket.Authentication;
 using SurveyBasket.Entities;
+using SurveyBasket.Errors;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
@@ -14,20 +15,24 @@ namespace SurveyBasket.Services
 
         private IJwtProvider _JwtProvider = jwtProvider;
         private readonly int _refreshTokenExpiryDays = 14;
-        public async Task<AuthResponse?> GetTokenAsync(string Email, string Password, CancellationToken cancellationToken)
+        public async Task<Result<AuthResponse>> GetTokenAsync(string Email, string Password, CancellationToken cancellationToken)
         {
             var currentUser = await _user.FindByEmailAsync(Email);
-            if (currentUser == null) return null;
+            if (currentUser == null) 
+                return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
             var checkPassword = await _user.CheckPasswordAsync(currentUser, Password);
-            if (!checkPassword) return null;
+            if (!checkPassword)
+               return Result.Failure<AuthResponse>(new Error("User.InvalidCredentials", "Invalid email/password"));
 
             var TokenResult = _JwtProvider.GenerateToken(currentUser);
             var refreshToken = GenerateRefreshToken();
             var refreshTokenExiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
             currentUser.RefreshTokens.Add(new RefreshToken { Token = refreshToken, ExpiresOn = refreshTokenExiration });
             await _user.UpdateAsync(currentUser);
-            return new AuthResponse(currentUser.Id, currentUser.Email, currentUser.FirstName, currentUser.LastName,
+           var response=new AuthResponse(currentUser.Id, currentUser.Email, currentUser.FirstName, currentUser.LastName,
                 TokenResult.Token, TokenResult.ExpiresIn, refreshToken, refreshTokenExiration);
+            return Result.Success(response);
+
         }
         public async Task<AuthResponse?> GetRefreshTokenAsync(string token, string refreshtoken, CancellationToken cancellationToken)
         {
