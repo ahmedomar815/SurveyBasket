@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SurveyBasket.Abstractions;
 using SurveyBasket.Authentication;
 using SurveyBasket.Services;
 
@@ -16,21 +17,24 @@ namespace SurveyBasket.Controllers
         [HttpPost("")]
         public async Task<IActionResult> LoginaAsync([FromBody]LoginRequest loginRequest, CancellationToken cancellationToken)
         {
+
             var authResult = await _authService.GetTokenAsync(loginRequest.Email, loginRequest.Password, cancellationToken);
-            return authResult.IsSuccess ? Ok(authResult.Value) : BadRequest(authResult.Error);
+            return authResult.IsSuccess ? Ok(authResult.Value) :
+                authResult.ToProblem(StatusCodes.Status400BadRequest);
         }
 
         [HttpPost("refreshToken")]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
         {
             var authResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
-            return authResult == null ? BadRequest("invalid Token") : Ok(authResult);
+            return authResult.IsSuccess?Ok(authResult.Value) :
+                authResult.ToProblem(StatusCodes.Status400BadRequest);
         }
         [HttpPut("revoked-refresh-token")]
         public async Task<IActionResult> RevokeRefreshTokenAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
         {
-            var IsRevoked = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
-            return IsRevoked ? Ok() : BadRequest("Operation vaild");
+            var Result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+            return Result.IsSuccess ? Ok() : Result.ToProblem(StatusCodes.Status400BadRequest);
         }
 
     }

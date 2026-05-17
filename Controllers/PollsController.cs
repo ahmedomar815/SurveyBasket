@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using SurveyBasket.Abstractions;
 using SurveyBasket.Entities;
 using SurveyBasket.Errors;
 using SurveyBasket.Services;
@@ -29,8 +30,7 @@ namespace SurveyBasket.Controllers
         public async Task<IActionResult> Get([FromRoute] int Id, CancellationToken cancellationToken)
         {
             var result = await _pollService.GetAsync(Id, cancellationToken);
-            return result.IsSuccess ? Ok(result.Value.Adapt<PollResponse>()) :Problem(statusCode:StatusCodes.Status404NotFound
-                , title: result.Error.Code,detail : result.Error.Descritpion);
+            return result.IsSuccess ? Ok(result.Value.Adapt<PollResponse>()) : result.ToProblem(StatusCodes.Status404NotFound);
 
         }
        
@@ -40,7 +40,7 @@ namespace SurveyBasket.Controllers
             var result = await _pollService.AddAsync(request, cancellationToken);
 
             if (result.IsFailure)
-                return Problem(statusCode: StatusCodes.Status400BadRequest,title:result.Error.Code,detail:result.Error.Descritpion);
+                return result.ToProblem(StatusCodes.Status400BadRequest);
 
             var poll = result.Value;
 
@@ -51,26 +51,20 @@ namespace SurveyBasket.Controllers
         public async Task<IActionResult> Update([FromRoute] int Id, [FromBody] PollRequest request, CancellationToken cancellationToken)
         {
            var result = await _pollService.UpdateAsync(Id, request, cancellationToken);
-           return result.IsSuccess ? NoContent() : Problem(statusCode: StatusCodes.Status404NotFound
-                , title: result.Error.Code, detail: result.Error.Descritpion);
+           return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
         }
         [HttpDelete("{Id}")]
         public async Task< IActionResult> Delete([FromRoute] int Id,CancellationToken cancellationToken)
         {
             var result = await  _pollService.DeleteAsync(Id, cancellationToken);
-            if (result.IsFailure)
-                Problem(statusCode: StatusCodes.Status404NotFound
-                , title: result.Error.Code, detail: result.Error.Descritpion);
-            return NoContent();
+            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
         }
         [HttpPut("{Id}/togglePublish")]
         public async Task<IActionResult> TogglePublish([FromRoute] int Id, CancellationToken cancellationToken)
         {
             var result = await _pollService.TogglePublishStatusAsync(Id, cancellationToken);
-            if (!result.IsSuccess)
-                Problem(statusCode: StatusCodes.Status404NotFound
-                     , title: result.Error.Code, detail: result.Error.Descritpion);
-            return NoContent();
+            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
+
         }
 
     }

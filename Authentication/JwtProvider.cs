@@ -48,7 +48,7 @@ namespace SurveyBasket.Authentication
                     ClockSkew=TimeSpan.Zero
                 },out SecurityToken validatedToken);
                 var jwtToken = (JwtSecurityToken)validatedToken;
-              return  jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+              return  jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value;
             }
             catch
             {
