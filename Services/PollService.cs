@@ -1,4 +1,5 @@
 ﻿
+using Azure.Core;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Errors;
@@ -12,40 +13,41 @@ namespace SurveyBasket.Services
         private readonly ApplicationDbContext _context = context;
 
 
-        public async Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken = default) => await _context.Polls!.AsNoTracking().ToListAsync();
-
+        public async Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken = default)
+            => await _context.Polls
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
         public async Task<Result<Poll>> GetAsync(int Id, CancellationToken cancellationToken)
         {
             var poll=await _context.Polls!.FindAsync(Id, cancellationToken);
             return poll is not null ? Result.Success(poll) : Result.Failure<Poll>(PollErrors.PollNotFound);
 
         }
-        public async Task<Result<Poll>> AddAsync(PollRequest poll, CancellationToken cancellationToken = default)
+        public async Task<Result<PollResponse>> AddAsync(PollRequest request, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var entity = poll.Adapt<Poll>();
+            var isExistingTitle=await _context.Polls!.AnyAsync(p => p.Title == request.Title, cancellationToken);
+            if (isExistingTitle)
+                return Result.Failure<PollResponse>(PollErrors.DuplicatedPollTitle);
+            var poll = request.Adapt<Poll>();
+            await _context.AddAsync(poll, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-                await _context.AddAsync(entity, cancellationToken);
-                await _context.SaveChangesAsync(cancellationToken);
-
-                return Result.Success(entity);
-            }
-            catch
-            {
-                return Result.Failure<Poll>(PollErrors.CreationFailed);
-            }
+            return Result.Success (poll.Adapt<PollResponse>());
+          
         }
-        public async Task<Result> UpdateAsync(int Id, PollRequest poll, CancellationToken cancellationToken = default)
+        public async Task<Result> UpdateAsync(int Id, PollRequest request, CancellationToken cancellationToken = default)
         {
-           var currentPoll=await _context.Polls!.FindAsync(Id, cancellationToken);
+            var isExistingTitle = await _context.Polls!.AnyAsync(p => p.Title == request.Title && p.Id!= Id, cancellationToken);
+            if (isExistingTitle)
+                return Result.Failure<PollResponse>(PollErrors.DuplicatedPollTitle);
+            var currentPoll=await _context.Polls!.FindAsync(Id, cancellationToken);
             if (currentPoll is null)
                 return Result.Failure(PollErrors.PollNotFound);
-              currentPoll.Title = poll.Title;
-            currentPoll.Summary = poll.Summary;
-            currentPoll.StartsAt = poll.StartsAt;
-            currentPoll.EndsAt = poll.EndsAt;
-            await _context.SaveChangesAsync();
+              currentPoll.Title = request.Title;
+            currentPoll.Summary = request.Summary;
+            currentPoll.StartsAt = request.StartsAt;
+            currentPoll.EndsAt = request.EndsAt;
+            await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
         public async Task<Result> DeleteAsync(int Id, CancellationToken cancellationToken = default)
@@ -67,5 +69,6 @@ namespace SurveyBasket.Services
              return Result.Success();
         }
 
+        
     }
 }

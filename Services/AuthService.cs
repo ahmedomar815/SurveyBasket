@@ -63,6 +63,7 @@ namespace SurveyBasket.Services
             if (user is null) return Result.Failure(UserErrors.InvalidCredentials);
             var userrefreshToken = user.RefreshTokens.FirstOrDefault(x => x.Token == refreshtoken && x.IsActive);
             if (userrefreshToken is null) return Result.Failure(UserErrors.InvalidCredentials);
+            userrefreshToken.RovkedOn = DateTime.UtcNow;
             await _user.UpdateAsync(user);
             return Result.Success();
 

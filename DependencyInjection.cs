@@ -38,7 +38,10 @@ namespace SurveyBasket
             services.AddFluentValidationConfig();
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IAuthService, AuthService>();
-            
+            services.AddScoped<IQuestionService, QuestionService>();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+
             return services;
         }
         private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
