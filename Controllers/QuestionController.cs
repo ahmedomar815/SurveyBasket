@@ -5,7 +5,7 @@ using SurveyBasket.Contracts.Questions;
 
 namespace SurveyBasket.Controllers
 {
-    [Route("api/polls/{pollId}/[controller]")]
+    [Route("api/Polls/{pollId}/[controller]")]
     [ApiController]
     [Authorize]
     public class QuestionController(IQuestionService questionService) : ControllerBase
@@ -17,22 +17,21 @@ namespace SurveyBasket.Controllers
         {
             var result = await _QuestionService.GetAllAsync(pollId, cancellationToken);
 
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
-        [HttpGet("{Id}")]
+        [HttpGet("{questionId}")]
         public async Task<IActionResult> Get([FromRoute]int pollId, [FromRoute] int questionId, CancellationToken cancellationToken = default)
         {
             var result = await _QuestionService.GetAsync(pollId, questionId, cancellationToken);
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
         [HttpPost("")]
         public async Task<IActionResult> AddAsync(int pollId, QuestionRequest request, CancellationToken cancellationToken = default)
         {
             var result = await _QuestionService.AddAsync(pollId, request, cancellationToken);
-            if (result.IsSuccess) return CreatedAtAction(nameof(Get), new { pollId = pollId, Id = result.Value.Id }, result.Value);
+            if (result.IsSuccess) return CreatedAtAction(nameof(Get), new { pollId = pollId, questionId = result.Value.Id }, result.Value);
 
-            return result.Error.Equals(QuestionErrors.DuplicatedQuestonContent) ?
-                result.ToProblem(StatusCodes.Status409Conflict) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.ToProblem();
         }
 
         [HttpPut("{questionId}")]
@@ -40,16 +39,17 @@ namespace SurveyBasket.Controllers
         {
             var result= await _QuestionService.UpdateAsync(pollId, questionId, request, cancellationToken);
             if (result.IsSuccess) return NoContent();
+            return result.ToProblem();
 
-            return result.Error.Equals(QuestionErrors.DuplicatedQuestonContent) ?
-                result.ToProblem(StatusCodes.Status409Conflict) : result.ToProblem(StatusCodes.Status404NotFound);
+
 
         }
         [HttpPut("{questionId}/toggle-status")]
         public async Task<IActionResult> ToggleStatusAsync([FromRoute] int pollId, [FromRoute] int questionId, CancellationToken cancellationToken = default)
         {
             var result = await _QuestionService.ToggleStatusAsync(pollId, questionId, cancellationToken);
-            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+
         }
 
     }

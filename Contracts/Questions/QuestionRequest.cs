@@ -1,4 +1,4 @@
 ﻿namespace SurveyBasket.Contracts.Questions
 {
-    public record QuestionRequest(string content, List<string>Answers);
+    public record QuestionRequest(string Content, List<string>Answers);
 }

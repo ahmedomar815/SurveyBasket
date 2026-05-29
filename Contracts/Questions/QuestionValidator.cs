@@ -4,7 +4,7 @@
     {
         public QuestionValidator()
         {
-            RuleFor(x => x.content)
+            RuleFor(x => x.Content)
                 .NotEmpty()
                 .Length(3, 1000);
 

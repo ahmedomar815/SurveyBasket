@@ -22,7 +22,7 @@ namespace SurveyBasket.Services
                 return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
             var checkPassword = await _user.CheckPasswordAsync(currentUser, Password);
             if (!checkPassword)
-               return Result.Failure<AuthResponse>(new Error("User.InvalidCredentials", "Invalid email/password"));
+                return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
 
             var TokenResult = _JwtProvider.GenerateToken(currentUser);
             var refreshToken = GenerateRefreshToken();
