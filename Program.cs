@@ -1,6 +1,7 @@
 using FluentValidation;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket;
 using SurveyBasket.Entities;
@@ -16,6 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDependencies(builder.Configuration);
+
+// Configure Serilog for ASP.NET Core
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration);
+        
+});
 
 var app = builder.Build();
 
