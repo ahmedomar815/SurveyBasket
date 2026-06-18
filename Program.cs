@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDependencies(builder.Configuration);
-
+builder.Services.AddHybridCache();
 // Configure Serilog for ASP.NET Core
 builder.Host.UseSerilog((context, configuration) =>
 {

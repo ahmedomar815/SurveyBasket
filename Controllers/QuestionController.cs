@@ -11,7 +11,7 @@ namespace SurveyBasket.Controllers
     public class QuestionController(IQuestionService questionService) : ControllerBase
     {
         public readonly IQuestionService _QuestionService = questionService;
-
+     
         [HttpGet("")]
         public async Task<IActionResult> GetAll([FromRoute] int pollId, CancellationToken cancellationToken = default)
         {

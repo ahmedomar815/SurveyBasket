@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Authentication;
 using SurveyBasket.Entities;
 using SurveyBasket.Persistence;
 using SurveyBasket.Services;
+using SurveyBasket.Settings;
 using System.Reflection;
 using System.Runtime;
 using System.Text;
@@ -58,7 +60,7 @@ namespace SurveyBasket
         {
             var mappingconfig = TypeAdapterConfig.GlobalSettings;
             mappingconfig.Scan(Assembly.GetExecutingAssembly());
-            services.AddSingleton<IMapper>(new Mapper(mappingconfig));
+            services.AddSingleton<IMapper>(implementationInstance: new Mapper(mappingconfig));
             return services;
         }
         private static IServiceCollection AddFluentValidationConfig(this IServiceCollection services)
@@ -69,11 +71,13 @@ namespace SurveyBasket
         }
         private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             services.AddSingleton<IJwtProvider, JwtProvider>();
             services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName).ValidateDataAnnotations().ValidateOnStart();
             services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+            services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
             var jwtSettings=configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,6 +99,13 @@ namespace SurveyBasket
                };
            });
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.SignIn.RequireConfirmedAccount = true;
+                options.User.RequireUniqueEmail = true;
+            }
+            );
             return services;
         }
     }

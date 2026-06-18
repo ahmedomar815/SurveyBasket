@@ -14,6 +14,7 @@ namespace SurveyBasket.Controllers
         private readonly IVoteService _voteService = voteService;
 
         [HttpGet("start")]
+      
         public async Task<IActionResult> StartVote([FromRoute] int pollId, CancellationToken cancellationToken)
         {
             var userId = User.GetUserId();
