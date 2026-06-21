@@ -2,6 +2,7 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
@@ -43,6 +44,7 @@ namespace SurveyBasket
             services.AddScoped<IQuestionService, QuestionService>();
             services.AddScoped<IResultService, ResultService>();   
             services.AddScoped<IVoteService, VoteService>();
+            services.AddScoped<IEmailSender, EmailService>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
 
@@ -102,7 +104,7 @@ namespace SurveyBasket
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 8;
-                options.SignIn.RequireConfirmedAccount = true;
+               options.SignIn.RequireConfirmedAccount = true;
                 options.User.RequireUniqueEmail = true;
             }
             );
