@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -38,6 +39,7 @@ namespace SurveyBasket
             services.AddDbContext<ApplicationDbContext>(options =>options.UseSqlServer(connectionString));
             services.AddSwaggerServices();
             services.AddMapsterConfig();
+            services.AddBackgroundJobsConfig(configuration);
             services.AddFluentValidationConfig();
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IAuthService, AuthService>();
@@ -45,6 +47,7 @@ namespace SurveyBasket
             services.AddScoped<IResultService, ResultService>();   
             services.AddScoped<IVoteService, VoteService>();
             services.AddScoped<IEmailSender, EmailService>();
+            services.AddScoped<INotifiactionService, NotificationService>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
 
@@ -108,6 +111,16 @@ namespace SurveyBasket
                 options.User.RequireUniqueEmail = true;
             }
             );
+            return services;
+        }
+        private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(config => config
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+            services.AddHangfireServer();
             return services;
         }
     }

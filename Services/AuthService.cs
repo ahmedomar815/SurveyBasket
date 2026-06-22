@@ -1,4 +1,5 @@
 ﻿
+using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
@@ -147,7 +148,8 @@ namespace SurveyBasket.Services
                     {"{{action_url}}",$"{origin}/auth/emailConfirmation?userId={user.Id}&code={code}" }
 
                 });
-            await _emailSender.SendEmailAsync(user.Email!, "Survey Basket:Email Confirmation", emailBody);
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "Survey Basket:Email Confirmation", emailBody));
+           
         }
         private static string GenerateRefreshToken()
         {

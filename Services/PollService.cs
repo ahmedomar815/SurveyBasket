@@ -1,5 +1,6 @@
 ﻿
 using Azure.Core;
+using Hangfire;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Errors;
@@ -7,11 +8,11 @@ using SurveyBasket.Persistence;
 
 namespace SurveyBasket.Services
 {
-    public class PollService(ApplicationDbContext context) : IPollService
+    public class PollService(ApplicationDbContext context,INotifiactionService notifiactionService) : IPollService
     {
 
         private readonly ApplicationDbContext _context = context;
-
+        private readonly INotifiactionService _notifiactionService = notifiactionService;
 
         public async Task<IEnumerable<PollResponse>> GetAllAsync(CancellationToken cancellationToken = default)
             => await _context.Polls
@@ -72,7 +73,9 @@ namespace SurveyBasket.Services
             if (result.IsFailure) return Result.Failure(result.Error);
              var currentPoll = result.Value;
             currentPoll.IsPublished = !currentPoll.IsPublished;
-             await _context.SaveChangesAsync();  
+             await _context.SaveChangesAsync();
+            if (currentPoll.IsPublished && currentPoll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+                BackgroundJob.Enqueue(() => _notifiactionService.SendNewPollsNoification(currentPoll.Id));
              return Result.Success();
         }
 
