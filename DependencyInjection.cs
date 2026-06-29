@@ -1,21 +1,14 @@
-﻿using FluentValidation;
-using Hangfire;
+﻿using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Authentication;
-using SurveyBasket.Entities;
-using SurveyBasket.Persistence;
-using SurveyBasket.Services;
+using SurveyBasket.Authentication.Filters;
 using SurveyBasket.Settings;
 using System.Reflection;
-using System.Runtime;
 using System.Text;
 namespace SurveyBasket
 {
@@ -48,6 +41,8 @@ namespace SurveyBasket
             services.AddScoped<IVoteService, VoteService>();
             services.AddScoped<IEmailSender, EmailService>();
             services.AddScoped<INotifiactionService, NotificationService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
 
@@ -76,11 +71,13 @@ namespace SurveyBasket
         }
         private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             services.AddSingleton<IJwtProvider, JwtProvider>();
             services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName).ValidateDataAnnotations().ValidateOnStart();
             services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
             services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            services.AddTransient<IAuthorizationHandler,PermissionAuthorizationHandler>();
+            services.AddTransient<IAuthorizationPolicyProvider,PermissionAuthorizationPolicyProvider>();
             var jwtSettings=configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
             services.AddAuthentication(options =>

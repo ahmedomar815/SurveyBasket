@@ -1,19 +1,8 @@
-using FluentValidation;
+
 using Hangfire;
-using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
-using MapsterMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic.FileIO;
 using Serilog;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket;
-
-
-
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependencies(builder.Configuration);
@@ -41,7 +30,7 @@ app.UseHangfireDashboard("/jobs", new DashboardOptions
         [
              new HangfireCustomBasicAuthenticationFilter
              {
-                 User=app.Configuration.GetValue<string>("HangfireSettings:Username"),
+                 User=app.Configuration.GetValue<string>("HangfireSettings:Username"), 
                  Pass=app.Configuration.GetValue<string>("HangfireSettings:Password")
              }
         ],

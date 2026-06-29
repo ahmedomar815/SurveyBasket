@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 using SurveyBasket.Helpers;
 
 namespace SurveyBasket.Services;

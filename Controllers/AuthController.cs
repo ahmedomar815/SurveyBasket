@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SurveyBasket.Abstractions;
 using SurveyBasket.Authentication;
+using SurveyBasket.Contracts.User;
 using SurveyBasket.Services;
 
 namespace SurveyBasket.Controllers
@@ -56,7 +57,25 @@ namespace SurveyBasket.Controllers
             return authResult.IsSuccess ? Ok() : authResult.ToProblem();
 
         }
+        [HttpPost("forget-password")]
+        public async Task<IActionResult> ForgetPassword([FromBody] UserForgetPasswordRequest request)
+        {
+            var authResult = await _authService.SendResetPasswordCodeAsync(request.email);
+            return authResult.IsSuccess ? Ok() : authResult.ToProblem();
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] UserResetPasswordRequest request)
+        {
+            var authResult = await _authService.ResetPasswordAsync(request);
+            return authResult.IsSuccess ? Ok() : authResult.ToProblem();
+        }
+        [HttpGet("get-permission")]
 
-
+        public async Task<IActionResult> getPermission()
+        {
+            return Ok(Permissions.GetAllPermissions());
+        }   
     }
+
+    
 }

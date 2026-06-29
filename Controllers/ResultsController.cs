@@ -1,9 +1,8 @@
 ﻿
-
 namespace SurveyBasket.Controllers
 {
     [Route("api/polls/{pollId}/{controller}")]
-    [Authorize]
+    [HasPermission(Permissions.Results)]
     public class ResultsController(IResultService resultService): ControllerBase
     {
         public IResultService _resultService= resultService;
