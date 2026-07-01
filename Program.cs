@@ -1,6 +1,8 @@
 
 using Hangfire;
 using HangfireBasicAuthenticationFilter;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using SurveyBasket;
 var builder = WebApplication.CreateBuilder(args);
@@ -44,4 +46,9 @@ RecurringJob.AddOrUpdate("sendNewPollsNotification",()=>notificationService.Send
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health",
+    new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
 app.Run();

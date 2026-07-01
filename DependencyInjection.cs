@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Authentication;
 using SurveyBasket.Authentication.Filters;
+using SurveyBasket.Health;
 using SurveyBasket.Settings;
 using System.Reflection;
 using System.Text;
@@ -45,7 +46,9 @@ namespace SurveyBasket
             services.AddScoped<IRoleService, RoleService>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
-
+            services.AddHealthChecks().AddSqlServer(name:"database",connectionString:configuration.GetConnectionString("DefaultConnection")!)
+                .AddHangfire(options => options.MinimumAvailableServers=1)
+                .AddCheck<MailProviderHealthCheck>("Mail Services");
             return services;
         }
         private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
