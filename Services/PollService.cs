@@ -20,11 +20,14 @@ namespace SurveyBasket.Services
                 .ProjectToType<PollResponse>()
                 .ToListAsync(cancellationToken);
         public async Task<IEnumerable<PollResponse>> GetCurrentAsync(CancellationToken cancellationToken = default)
-            => await _context.Polls
-                .AsNoTracking()
-                .Where(p=>p.IsPublished&&p.StartsAt<=DateOnly.FromDateTime(DateTime.UtcNow)&& p.EndsAt>= DateOnly.FromDateTime(DateTime.UtcNow))
+            => await GetQuery()
                 .ProjectToType<PollResponse>()
                 .ToListAsync(cancellationToken);
+        public async Task<IEnumerable<PollResponseV2>> GetCurrentAsyncV2(CancellationToken cancellationToken = default)
+           => await GetQuery()
+               .ProjectToType<PollResponseV2>()
+               .ToListAsync(cancellationToken);
+
         public async Task<Result<Poll>> GetAsync(int Id, CancellationToken cancellationToken)
         {
             var poll=await _context.Polls!.FindAsync(Id, cancellationToken);
@@ -79,6 +82,12 @@ namespace SurveyBasket.Services
              return Result.Success();
         }
 
-        
+        private IQueryable<Poll> GetQuery()
+        {
+            var query = _context.Polls
+                .AsNoTracking()
+                .Where(p => p.IsPublished && p.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && p.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow));
+            return query;
+        }
     }
 }

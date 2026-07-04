@@ -1,8 +1,10 @@
-﻿using Hangfire;
+﻿using Asp.Versioning;
+using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Authentication;
@@ -11,6 +13,7 @@ using SurveyBasket.Health;
 using SurveyBasket.Settings;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 namespace SurveyBasket
 {
     public static class DependencyInjection
@@ -49,6 +52,23 @@ namespace SurveyBasket
             services.AddHealthChecks().AddSqlServer(name:"database",connectionString:configuration.GetConnectionString("DefaultConnection")!)
                 .AddHangfire(options => options.MinimumAvailableServers=1)
                 .AddCheck<MailProviderHealthCheck>("Mail Services");
+            services.AddApiVersioning(Options =>
+            {
+                Options.DefaultApiVersion = new ApiVersion(1);
+                Options.AssumeDefaultVersionWhenUnspecified = true;
+                Options.ReportApiVersions = true;
+            Options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+            }
+        )
+                .AddApiExplorer(Options =>
+                {
+                    Options.GroupNameFormat = "'v'V";
+                    Options.SubstituteApiVersionInUrl = true;
+                }
+                );
+
+           
+
             return services;
         }
         private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
@@ -121,6 +141,55 @@ namespace SurveyBasket
         .UseRecommendedSerializerSettings()
         .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
             services.AddHangfireServer();
+            return services;
+        }
+        private static IServiceCollection AddRateLimiter (this IServiceCollection services)
+        {
+            services.AddRateLimiter(delegate (RateLimiterOptions options)
+
+
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddConcurrencyLimiter("concurrencyLimit", delegate (ConcurrencyLimiterOptions Options)
+                {
+
+
+                    Options.PermitLimit = 1000;
+                    Options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    Options.QueueLimit = 100;
+
+                });
+                options.AddPolicy("ipLimit", delegate (HttpContext httpContext)
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                        factory: delegate
+                        {
+                            var limiterOptions = new FixedWindowRateLimiterOptions();
+                            limiterOptions.PermitLimit = 2;
+                            limiterOptions.Window = TimeSpan.FromSeconds(20);
+
+
+                            return limiterOptions;
+                        });
+                });
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddPolicy("UserLimit", delegate (HttpContext httpContext)
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.GetUserId(),
+                        factory: delegate
+                        {
+                            var limiterOptions = new FixedWindowRateLimiterOptions();
+                            limiterOptions.PermitLimit = 2;
+                            limiterOptions.Window = TimeSpan.FromSeconds(20);
+
+
+                            return limiterOptions;
+                        });
+                });
+            });
             return services;
         }
     }

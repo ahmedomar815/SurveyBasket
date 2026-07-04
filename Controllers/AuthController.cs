@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using SurveyBasket.Abstractions;
 using SurveyBasket.Authentication;
@@ -10,6 +11,7 @@ namespace SurveyBasket.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [EnableRateLimiting("ipLimit")]
     public class AuthController(IAuthService authService,ILogger<AuthController> logger) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
@@ -37,6 +39,7 @@ namespace SurveyBasket.Controllers
             return Result.IsSuccess ? Ok() : Result.ToProblem();
         }
         [HttpPost("register")]
+        [DisableRateLimiting()]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
         {
             var authResult = await _authService.RegisterAsync(request, cancellationToken);
@@ -69,11 +72,12 @@ namespace SurveyBasket.Controllers
             var authResult = await _authService.ResetPasswordAsync(request);
             return authResult.IsSuccess ? Ok() : authResult.ToProblem();
         }
-        [HttpGet("get-permission")]
-
-        public async Task<IActionResult> getPermission()
+        [HttpGet("test")]
+        [EnableRateLimiting("concurrency")]
+        public IActionResult test()
         {
-            return Ok(Permissions.GetAllPermissions());
+            Thread.Sleep(6000);
+            return Ok();
         }   
     }
 

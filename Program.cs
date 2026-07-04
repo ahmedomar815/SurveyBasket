@@ -46,6 +46,7 @@ RecurringJob.AddOrUpdate("sendNewPollsNotification",()=>notificationService.Send
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseRateLimiter();
 app.MapHealthChecks("/health",
     new HealthCheckOptions
     {

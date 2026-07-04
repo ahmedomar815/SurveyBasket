@@ -1,11 +1,14 @@
 ﻿
+using Asp.Versioning;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 namespace SurveyBasket.Controllers
 {
-
     [Route("api/[controller]")]
+    [ApiVersion(1,Deprecated =true)]
+    [ApiVersion("2.0")]
     [ApiController]
     
     public class PollsController(IPollService pollService,UserManager<ApplicationUser> userManager) : ControllerBase
@@ -21,12 +24,22 @@ namespace SurveyBasket.Controllers
         {
             return Ok(await _pollService.GetAllAsync(cancellationToken)); 
         }
+        [MapToApiVersion("1.0")]
         [HttpGet("current")]
+        [EnableRateLimiting("UserLimit")]
         [Authorize(Roles =DefaultRoles.Member)]
         public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
         {
            
             return Ok(await _pollService.GetCurrentAsync( cancellationToken));
+        }
+        [MapToApiVersion("2.0")]
+        [HttpGet("current")]
+        [Authorize(Roles = DefaultRoles.Member)]
+        public async Task<IActionResult> GetCurrentV2(CancellationToken cancellationToken)
+        {
+
+            return Ok(await _pollService.GetCurrentAsync(cancellationToken));
         }
 
         [HttpGet("{Id}")]
