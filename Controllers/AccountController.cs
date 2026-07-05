@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
 using SurveyBasket.Contracts.User;
 
 namespace SurveyBasket.Controllers;
 
 [Route("me")]
+[ApiVersion(1, Deprecated = true)]
+[ApiVersion("2.0")]
 [ApiController]
 [Authorize]
 public class AccountController(IUserService userService) : ControllerBase

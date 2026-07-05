@@ -1,10 +1,7 @@
 ﻿
-using Azure.Core;
+
 using Hangfire;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
-using SurveyBasket.Errors;
-using SurveyBasket.Persistence;
+
 
 namespace SurveyBasket.Services
 {
@@ -54,10 +51,7 @@ namespace SurveyBasket.Services
             var currentPoll=await _context.Polls!.FindAsync(Id, cancellationToken);
             if (currentPoll is null)
                 return Result.Failure(PollErrors.PollNotFound);
-              currentPoll.Title = request.Title;
-            currentPoll.Summary = request.Summary;
-            currentPoll.StartsAt = request.StartsAt;
-            currentPoll.EndsAt = request.EndsAt;
+            currentPoll = request.Adapt(currentPoll);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

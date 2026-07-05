@@ -27,7 +27,7 @@ public class NotificationService (ApplicationDbContext contxt,
             polls = await _contxt.Polls.Where(x => x.IsPublished && x.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
                 .AsNoTracking().ToListAsync();
         }
-        var users = await _userManager.Users.ToListAsync();
+        var users = await _userManager.GetUsersInRoleAsync(DefaultRoles.Member.Name);
         var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
         foreach( var poll in polls)
         {

@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
-using SurveyBasket.Abstractions;
-using SurveyBasket.Authentication;
 using SurveyBasket.Contracts.User;
-using SurveyBasket.Services;
-
 namespace SurveyBasket.Controllers
 {
+    [ApiVersion(1, Deprecated = true)]
+    [ApiVersion("2.0")]
     [Route("[controller]")]
     [ApiController]
     [EnableRateLimiting("ipLimit")]
@@ -26,7 +22,7 @@ namespace SurveyBasket.Controllers
             return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
         }
 
-        [HttpPost("refreshToken")]
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
         {
             var authResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
@@ -72,13 +68,7 @@ namespace SurveyBasket.Controllers
             var authResult = await _authService.ResetPasswordAsync(request);
             return authResult.IsSuccess ? Ok() : authResult.ToProblem();
         }
-        [HttpGet("test")]
-        [EnableRateLimiting("concurrency")]
-        public IActionResult test()
-        {
-            Thread.Sleep(6000);
-            return Ok();
-        }   
+        
     }
 
     

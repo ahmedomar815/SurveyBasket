@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-
+﻿
 namespace SurveyBasket.Contracts.Authentication
 {
     public record AuthResponse(

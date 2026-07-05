@@ -1,6 +1,4 @@
 ﻿
-using SurveyBasket.Contracts.Questions;
-using System.Threading;
 
 namespace SurveyBasket.Services
 {

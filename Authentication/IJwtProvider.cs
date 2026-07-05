@@ -1,5 +1,4 @@
-﻿using SurveyBasket.Entities;
-
+﻿
 namespace SurveyBasket.Authentication
 {
     public interface IJwtProvider

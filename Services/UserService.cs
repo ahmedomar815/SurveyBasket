@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿
 using Microsoft.AspNetCore.Identity;
 using SurveyBasket.Contracts.User;
-using SurveyBasket.Migrations;
-
 namespace SurveyBasket.Services;
 
 public class UserService(UserManager<ApplicationUser> userManager,IRoleService roleService, ApplicationDbContext context) : IUserService
@@ -45,7 +43,7 @@ public class UserService(UserManager<ApplicationUser> userManager,IRoleService r
                on u.Id equals ur.UserId
                join r in _context.Roles
                on ur.RoleId equals r.Id
-               where r.Name != DefaultRoles.Member
+               where r.Name != DefaultRoles.Member.Name
                select new
                {
                    u.Id,

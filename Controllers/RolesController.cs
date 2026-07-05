@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
 using SurveyBasket.Contracts.Roles;
 
 namespace SurveyBasket.Controllers;
 
+[ApiVersion(1, Deprecated = true)]
+[ApiVersion("2.0")]
 [Route("api/[controller]")]
 [ApiController]
 public class RolesController(IRoleService roleService) : ControllerBase
 {
     private readonly IRoleService _roleService = roleService;
 
-    [HttpGet("getAll")]
+    [HttpGet("")]
     [HasPermission(Permissions.GetRoles)]
     public async Task<IActionResult> GetAll([FromQuery] bool includeDisable, CancellationToken cancellationToken)
     {

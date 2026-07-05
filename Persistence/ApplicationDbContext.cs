@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using SurveyBasket.Entities;
-using SurveyBasket.Persistence.EntitiesConfiguration;
 using System.Reflection;
 using System.Security.Claims;
 

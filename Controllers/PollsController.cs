@@ -18,7 +18,7 @@ namespace SurveyBasket.Controllers
         public UserManager<ApplicationUser> _UserManager  = userManager;
 
 
-        [HttpGet("getAll")]
+        [HttpGet("")]
         [HasPermission(Permissions.GetPolls)]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
@@ -27,7 +27,7 @@ namespace SurveyBasket.Controllers
         [MapToApiVersion("1.0")]
         [HttpGet("current")]
         [EnableRateLimiting("UserLimit")]
-        [Authorize(Roles =DefaultRoles.Member)]
+        [Authorize(Roles =DefaultRoles.Member.Name)]
         public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
         {
            
@@ -35,7 +35,7 @@ namespace SurveyBasket.Controllers
         }
         [MapToApiVersion("2.0")]
         [HttpGet("current")]
-        [Authorize(Roles = DefaultRoles.Member)]
+        [Authorize(Roles = DefaultRoles.Member.Name)]
         public async Task<IActionResult> GetCurrentV2(CancellationToken cancellationToken)
         {
 
@@ -81,7 +81,7 @@ namespace SurveyBasket.Controllers
             var result = await  _pollService.DeleteAsync(Id, cancellationToken);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
-        [HttpPut("{Id}/togglePublish")]
+        [HttpPut("{Id}/toggle-publish")]
         [HasPermission(Permissions.UpdatePolls)]
         public async Task<IActionResult> TogglePublish([FromRoute] int Id, CancellationToken cancellationToken)
         {

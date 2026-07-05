@@ -113,7 +113,7 @@ namespace SurveyBasket.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@SURVEY-BASKET.COM",
                             NormalizedUserName = "ADMIN@SURVEY-BASKET.COM",
-                            PasswordHash = "P@ssword123",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJM4fT/mZmvf5BevLOV/oVNL4Et+728GrVtSEZqT6ibfkTkHtuVWtN2seqH6kkQKdA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "019f016b-5d2c-7838-8817-b9ba67e52df0",
                             TwoFactorEnabled = false,
@@ -383,7 +383,7 @@ namespace SurveyBasket.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Polls", (string)null);
+                    b.ToTable("Polls");
                 });
 
             modelBuilder.Entity("SurveyBasket.Entities.Answer", b =>
@@ -410,7 +410,7 @@ namespace SurveyBasket.Migrations
                     b.HasIndex("QuestionId", "Content")
                         .IsUnique();
 
-                    b.ToTable("Answeers", (string)null);
+                    b.ToTable("Answeers");
                 });
 
             modelBuilder.Entity("SurveyBasket.Entities.ApplicationRole", b =>
@@ -506,7 +506,7 @@ namespace SurveyBasket.Migrations
 
                     b.HasIndex("PollId", "Content");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("SurveyBasket.Entities.Vote", b =>
@@ -534,7 +534,7 @@ namespace SurveyBasket.Migrations
                     b.HasIndex("PollId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("Votes", (string)null);
+                    b.ToTable("Votes");
                 });
 
             modelBuilder.Entity("SurveyBasket.Entities.VoteAnswer", b =>
@@ -563,7 +563,7 @@ namespace SurveyBasket.Migrations
                     b.HasIndex("VoteId", "QuestionId")
                         .IsUnique();
 
-                    b.ToTable("VoteAnswers", (string)null);
+                    b.ToTable("VoteAnswers");
                 });
 
             modelBuilder.Entity("ApplicationUser", b =>

@@ -13,7 +13,7 @@ namespace SurveyBasket.Persistence.EntitiesConfiguration
             builder.HasData(new IdentityUserRole<string>
             {
                 UserId = DefaultUsers.AdminId,
-                RoleId = DefaultRoles.AdminRoleId
+                RoleId = DefaultRoles.Admin.Id
             });
         }
     }

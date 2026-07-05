@@ -3,13 +3,14 @@ using Hangfire;
 using HangfireBasicAuthenticationFilter;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Scalar.AspNetCore;
 using Serilog;
 using SurveyBasket;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependencies(builder.Configuration);
 builder.Services.AddHybridCache();
-// Configure Serilog for ASP.NET Core
+
 builder.Host.UseSerilog((context, configuration) =>
 {
     configuration
@@ -21,8 +22,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi("/openapi/{documentName}.json");
+    app.MapScalarApiReference();
+   
 }
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
@@ -37,7 +39,7 @@ app.UseHangfireDashboard("/jobs", new DashboardOptions
              }
         ],
         DashboardTitle = "Survey Basket Dashboard",
-       // IsReadOnlyFunc=(DashboardContext context)=> true
+       
 });
 var scopeFactory= app.Services.GetRequiredService<IServiceScopeFactory>();
 using var scope=scopeFactory.CreateScope();

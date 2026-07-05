@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Errors
 {
-    public static  class UserErrors
+    public record UserErrors
     {
 
         public static Error UserNotFound => new Error("User.UserNotFound", "UserNotFound", StatusCodes.Status400BadRequest);

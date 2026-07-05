@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
 using SurveyBasket.Contracts.User;
 
 namespace SurveyBasket.Controllers;
 
-[Route("api/[controller]")]
+[ApiVersion(1, Deprecated = true)]
+[ApiVersion("2.0")]
+[Route("[controller]")]
 [ApiController]
 public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;
 
-    [HttpGet("getAll")]
+    [HttpGet("")]
     [HasPermission(Permissions.GetUsers)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {

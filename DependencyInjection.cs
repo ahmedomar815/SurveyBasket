@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,8 +9,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Authentication;
-using SurveyBasket.Authentication.Filters;
 using SurveyBasket.Health;
+using SurveyBasket.OpenApiTransformers;
 using SurveyBasket.Settings;
 using System.Reflection;
 using System.Text;
@@ -34,8 +35,9 @@ namespace SurveyBasket
              throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             services.AddAuthConfig(configuration);
             services.AddDbContext<ApplicationDbContext>(options =>options.UseSqlServer(connectionString));
-            services.AddSwaggerServices();
+          
             services.AddMapsterConfig();
+            services.AddRateLimiter();
             services.AddBackgroundJobsConfig(configuration);
             services.AddFluentValidationConfig();
             services.AddScoped<IPollService, PollService>();
@@ -49,7 +51,7 @@ namespace SurveyBasket
             services.AddScoped<IRoleService, RoleService>();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
-            services.AddHealthChecks().AddSqlServer(name:"database",connectionString:configuration.GetConnectionString("DefaultConnection")!)
+            services.AddHealthChecks().AddSqlServer(name:"database", connectionString:connectionString!)
                 .AddHangfire(options => options.MinimumAvailableServers=1)
                 .AddCheck<MailProviderHealthCheck>("Mail Services");
             services.AddApiVersioning(Options =>
@@ -67,15 +69,24 @@ namespace SurveyBasket
                 }
                 );
 
-           
+            services.AddEndpointsApiExplorer()
+                .AddOpenApiServices();
 
             return services;
         }
-        private static IServiceCollection AddSwaggerServices(this IServiceCollection services)
+        private static IServiceCollection AddOpenApiServices(this IServiceCollection services)
         {
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            var serviceProvider = services.BuildServiceProvider();
+            var apiVersionDescriptionProvider = serviceProvider.GetRequiredService<IApiVersionDescriptionProvider>();
 
+            foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+            {
+                services.AddOpenApi(description.GroupName, options =>
+                {
+                    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+                    options.AddDocumentTransformer(new ApiVersioningTransformer(description));
+                });
+            }
 
             return services;
         }
@@ -98,7 +109,7 @@ namespace SurveyBasket
             services.AddSingleton<IJwtProvider, JwtProvider>();
             services.AddOptions<JwtOptions>().BindConfiguration(JwtOptions.SectionName).ValidateDataAnnotations().ValidateOnStart();
             services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
-            services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            services.AddOptions<MailSettings>().BindConfiguration(nameof(MailSettings)).ValidateDataAnnotations().ValidateOnStart();
             services.AddTransient<IAuthorizationHandler,PermissionAuthorizationHandler>();
             services.AddTransient<IAuthorizationPolicyProvider,PermissionAuthorizationPolicyProvider>();
             var jwtSettings=configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();

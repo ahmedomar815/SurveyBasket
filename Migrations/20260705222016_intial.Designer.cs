@@ -12,8 +12,8 @@ using SurveyBasket.Persistence;
 namespace SurveyBasket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260626073046_intial migration")]
-    partial class intialmigration
+    [Migration("20260705222016_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,9 @@ namespace SurveyBasket.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -108,11 +111,12 @@ namespace SurveyBasket.Migrations
                             Email = "admin@survey-basket.com",
                             EmailConfirmed = true,
                             FirstName = "SurveyBasket",
+                            IsDisabled = false,
                             LastName = "Admin",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@SURVEY-BASKET.COM",
                             NormalizedUserName = "ADMIN@SURVEY-BASKET.COM",
-                            PasswordHash = "P@ssword123",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJM4fT/mZmvf5BevLOV/oVNL4Et+728GrVtSEZqT6ibfkTkHtuVWtN2seqH6kkQKdA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "019f016b-5d2c-7838-8817-b9ba67e52df0",
                             TwoFactorEnabled = false,

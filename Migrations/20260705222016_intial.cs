@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SurveyBasket.Migrations
 {
     /// <inheritdoc />
-    public partial class intialmigration : Migration
+    public partial class intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,6 +36,7 @@ namespace SurveyBasket.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsDisabled = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -345,8 +346,8 @@ namespace SurveyBasket.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "019f016b-5d2c-7838-8817-b9b9f916ab20", 0, "019f016b-5d2c-7838-8817-b9bb05c255fd", "admin@survey-basket.com", true, "SurveyBasket", "Admin", false, null, "ADMIN@SURVEY-BASKET.COM", "ADMIN@SURVEY-BASKET.COM", "P@ssword123", null, false, "019f016b-5d2c-7838-8817-b9ba67e52df0", false, "admin@survey-basket.com" });
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsDisabled", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "019f016b-5d2c-7838-8817-b9b9f916ab20", 0, "019f016b-5d2c-7838-8817-b9bb05c255fd", "admin@survey-basket.com", true, "SurveyBasket", false, "Admin", false, null, "ADMIN@SURVEY-BASKET.COM", "ADMIN@SURVEY-BASKET.COM", "AQAAAAIAAYagAAAAEJM4fT/mZmvf5BevLOV/oVNL4Et+728GrVtSEZqT6ibfkTkHtuVWtN2seqH6kkQKdA==", null, false, "019f016b-5d2c-7838-8817-b9ba67e52df0", false, "admin@survey-basket.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoleClaims",

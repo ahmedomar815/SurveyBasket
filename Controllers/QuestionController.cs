@@ -1,8 +1,11 @@
-﻿using SurveyBasket.Contracts.Commons;
+﻿using Asp.Versioning;
+using SurveyBasket.Contracts.Commons;
 using SurveyBasket.Contracts.Questions;
 
 namespace SurveyBasket.Controllers
 {
+    [ApiVersion(1, Deprecated = true)]
+    [ApiVersion("2.0")]
     [Route("api/Polls/{pollId}/[controller]")]
     [ApiController]
     

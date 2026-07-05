@@ -1,13 +1,16 @@
 ﻿
+using Asp.Versioning;
 using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Contracts.Votes;
 
 
 namespace SurveyBasket.Controllers
 {
+    [ApiVersion(1, Deprecated = true)]
+    [ApiVersion("2.0")]
     [Route("api/Polls/{pollId}/[controller]")]
     [ApiController]
-    [Authorize(Roles = DefaultRoles.Member)]
+    [Authorize(Roles = DefaultRoles.Member.Name)]
     [EnableRateLimiting("concurrencyLimit")]
     public class VotesController(IQuestionService questionService,IVoteService voteService) : ControllerBase
     {

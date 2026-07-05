@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SurveyBasket.Contracts.Roles;
 using System.Data;
 
@@ -10,10 +9,10 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
     private readonly RoleManager<ApplicationRole> _roleManager= roleManager;
     private readonly ApplicationDbContext _Context= Context;
 
-    public async Task<IEnumerable<RoleResponse>> GetAllRolesAsync(bool? includeDisabled = false,CancellationToken cancellationToken=default)
+    public async Task<IEnumerable<RoleResponse>> GetAllRolesAsync(bool includeDisabled = false,CancellationToken cancellationToken=default)
     {
           return await _roleManager.Roles.Where
-           (x => !x.IsDefault && (!x.IsDeleted || (includeDisabled == true)))
+           (x => !x.IsDefault && (!x.IsDeleted || includeDisabled))
            .ProjectToType<RoleResponse>()
            .ToListAsync(cancellationToken);
     }
@@ -38,7 +37,7 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
         var role = new ApplicationRole
         {
             Name=request.Name,
-            ConcurrencyStamp=Guid.NewGuid().ToString(),
+            ConcurrencyStamp=Guid.CreateVersion7().ToString(),
         };
         var result = await _roleManager.CreateAsync(role);
         if(result.Succeeded)

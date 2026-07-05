@@ -1,16 +1,11 @@
 ﻿
 using Hangfire;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SurveyBasket.Authentication;
 using SurveyBasket.Contracts.User;
-using SurveyBasket.Entities;
-using SurveyBasket.Errors;
 using SurveyBasket.Helpers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -139,7 +134,7 @@ namespace SurveyBasket.Services
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if(result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user,DefaultRoles.Member);
+                await _userManager.AddToRoleAsync(user,DefaultRoles.Member.Name );
                 return Result.Success();
             }
             var error = result.Errors.First();
@@ -159,7 +154,7 @@ namespace SurveyBasket.Services
         public async Task<Result> SendResetPasswordCodeAsync(string Email)
         {
             if( await _userManager.FindByEmailAsync(Email) is not { } user) return Result.Success();
-            if(!user.EmailConfirmed) return Result.Failure(UserErrors.EmailNotConfirmed);
+            if(!user.EmailConfirmed) return Result.Failure(UserErrors.EmailNotConfirmed with { statuscode=StatusCodes.Status400BadRequest});
             var code=await _userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             _logger.LogInformation("Reset password code for user {Email} is {Code}", Email, code);

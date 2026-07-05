@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-
+﻿
 namespace SurveyBasket.Abstractions.Consts;
 
 public  static class Permissions

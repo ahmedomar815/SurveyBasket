@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿
 using Microsoft.IdentityModel.Tokens;
-using SurveyBasket.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -20,7 +18,7 @@ namespace SurveyBasket.Authentication
                 new (JwtRegisteredClaimNames.Email,user.Email!),
                 new (JwtRegisteredClaimNames.GivenName,user.FirstName),
                  new (JwtRegisteredClaimNames.FamilyName,user.LastName),
-                  new (JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()    ),
+                  new (JwtRegisteredClaimNames.Jti,Guid.CreateVersion7().ToString()    ),
                   new (nameof(roles),JsonSerializer.Serialize(roles),JsonClaimValueTypes.JsonArray),
                   new (nameof(permissions),JsonSerializer.Serialize(permissions),JsonClaimValueTypes.JsonArray)
                 ];

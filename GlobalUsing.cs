@@ -18,6 +18,6 @@ global using SurveyBasket.Abstractions;
 global using SurveyBasket.Errors;
 global using SurveyBasket.Extensions;
 global using SurveyBasket.Contracts.Results;
-global using Microsoft.AspNetCore.OutputCaching;
+
 global using  SurveyBasket.Abstractions.Consts;
 global using SurveyBasket.Authentication.Filters;
