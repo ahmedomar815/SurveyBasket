@@ -24,7 +24,7 @@ namespace SurveyBasket.Controllers
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
-        {
+        { 
             var authResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
             return authResult.IsSuccess?Ok(authResult.Value) :  authResult.ToProblem();
         }
